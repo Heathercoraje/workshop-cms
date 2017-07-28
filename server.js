@@ -1,17 +1,33 @@
 var http = require('http');
+var fs = require('fs');
+
 var server = http.createServer(handler);
 var message = ' I am happy to be part of the node girls project, I have a strong feeling that I will take this week to be a mentor.'
+var lunchMessage = ' I am hungry, I need to go home and cooook for my lunch'
+
 server.listen(3000, function() {
   console.log("Server is listening on port 3000. We are ready to aceept requests!");
 });
 
 function handler(request, response) {
-  response.writeHead(200, {
-    "Content-Type": "text/html"
-  }); //using writehead method to check status code
-  // then let it know we will send text in body
-  response.write(message); // write the message on body
+  var method = request.method;
+  console.log(method); //it returns get because we GET response by sending our url
 
-  response.end(); // finish this response
 
+  var endpoint = request.url;
+  console.log(endpoint);
+
+  if (endpoint === "/") {
+    response.writeHead(200, {
+      "Content-Type": "text/html"
+    }); //using writehead method to check status code
+    // then let it know we will send text in body
+    fs.readFile(__dirname + '/public/index.html', function(error, file) {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      response.end(file);
+    });
+  }
 }
