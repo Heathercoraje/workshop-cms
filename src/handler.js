@@ -13,8 +13,17 @@ function handler (request, response) {
     jpg: 'image/jpg',
     script: 'text/javascript'
   };
-
-  if (endpoint === '/') {
+  if (endpoint === '/posts') {
+    console.log('CHALLENGE FUCKING ACCEPTED!');
+    fs.readFile(filePathBase.replace('public/', 'src/posts.json'), function (error, file) {
+      if (error) {
+        console.log(error);
+      } else {
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.end(file);
+      }
+    });
+  } else if (endpoint === '/') {
     fs.readFile(filePathBase.concat('index.html'), function (error, file) {
       if (error) {
         console.log(error);
@@ -34,5 +43,6 @@ function handler (request, response) {
     });
   }
 }
+
 
 module.exports = handler;
