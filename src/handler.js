@@ -7,6 +7,7 @@ function handler (request, response) {
   var endpoint = request.url;
   var extension = request.url.split('.')[1];
   var filePathBase = __dirname.replace('src', 'public/');
+  var dataPath = filePathBase.replace('public/', 'src/posts.json');
   var extensionType = {
     html: 'text/html',
     css: 'text/css',
@@ -15,7 +16,7 @@ function handler (request, response) {
   };
   if (endpoint === '/posts') {
     console.log('CHALLENGE FUCKING ACCEPTED!');
-    fs.readFile(filePathBase.replace('public/', 'src/posts.json'), function (error, file) {
+    fs.readFile(dataPath, function (error, file) {
       if (error) {
         console.log(error);
       } else {
@@ -23,6 +24,10 @@ function handler (request, response) {
         response.end(file);
       }
     });
+  } else if (endpoint === '/create/post' ) {
+    console.log('button click');
+    console.log(request.method);
+    //fs.writeFile(dataPath, )
   } else if (endpoint === '/') {
     fs.readFile(filePathBase.concat('index.html'), function (error, file) {
       if (error) {
@@ -43,6 +48,5 @@ function handler (request, response) {
     });
   }
 }
-
 
 module.exports = handler;
