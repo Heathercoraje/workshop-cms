@@ -1,7 +1,8 @@
 var http = require('http');// to have access to modules
-var server = http.createServer(handler); // handler function is called when request event happens
 var fs = require('fs');
 var path = require('path');
+var querystring = require('querystring');
+var server = http.createServer(handler); // handler function is called when request event happens
 
 var node = 'Programming is hard, I know';
 var girls = 'Challenge fucking accepted !';
@@ -56,6 +57,20 @@ function handler (request, response) {
         response.end(file);
         console.log('yeah!');
       }
+    });
+  }
+  if (request.method === 'POST') {
+    console.log('this is POST request! yeah!');
+    var allTheData = '';
+    request.on('data', function (chunkOfData) {
+      allTheData += chunkOfData;
+    });
+     // gradually collecting the data
+    request.on('end', function () {
+      var convertedData = querystring.parse(allTheData);
+      console.log(convertedData);
+      response.writeHead(301, {'Location': '/'}); // http status code 301 for redirect
+      response.end();
     });
   }
 }
