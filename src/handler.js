@@ -11,20 +11,31 @@ function handler (request, response) {
     html: 'text/html',
     css: 'text/css',
     jpg: 'image/jpg',
-    script: 'text/javascript'
+    script: 'text/javascript',
+    json: 'application/json'
   };
-  if (endpoint === '/posts') {
-    console.log('CHALLENGE FUCKING ACCEPTED!');
-    fs.readFile(dataPath, function (error, file) {
+  // generic function
+  function readFile (path) {
+    fs.readFile(path, function (error, file) {
       if (error) {
         console.log(error);
       } else {
-        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.writeHead(200, {'Content-Type': `${extensionType[extension]}`});
         response.end(file);
       }
     });
+  }
+  if (request.method === 'GET') {
+    console.log('GET request');
+    if (endpoint === '/') {
+      readFile(filePathBase.concat('index.html'));
+    } else if (endpoint === '/posts') {
+      readFile(dataPath);
+    } else {
+      readFile(filePathBase.concat(endpoint));
+    }
   } else if (request.method === 'POST') {
-    console.log('handling POST method ...');
+    console.log('POST request');
     var allData = '';
     request.on('data', function (chunk) {
       allData += chunk;
@@ -34,37 +45,17 @@ function handler (request, response) {
       var comment = convertedData['post'];
       var objFile = fs.readFileSync(dataPath);
       var obj = JSON.parse(objFile); // build JSON string to an object
-      console.log('JAVASCRIPT OBJECT', obj);
       obj[Date.now()] = comment; // adding new property to an object
       obj = JSON.stringify(obj); // make into a json
-      console.log('JSON', obj);
       fs.writeFile(dataPath, obj, function (error) {
         if (error) {
           console.log(error);
         }
         console.log('new comment added!');
-        console.log(obj);
+        console.log('new JSON', obj);
       });
       response.writeHead(301, {'Location': '/'}); // http status code 301 for redirec
       response.end();
-    });
-  } else if (endpoint === '/') {
-    fs.readFile(filePathBase.concat('index.html'), function (error, file) {
-      if (error) {
-        console.log(error);
-      } else {
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.end(file);
-      }
-    });
-  } else {
-    fs.readFile(filePathBase.concat(endpoint), function (error, file) {
-      if (error) {
-        console.log(error);
-      }
-      response.writeHead(200, {'Content-Type': `${extensionType[extension]}`});
-      response.end(file);
-      console.log('Animo!');
     });
   }
 }
